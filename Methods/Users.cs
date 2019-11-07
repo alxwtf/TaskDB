@@ -40,6 +40,7 @@ namespace TaskDB
         {
             System.Console.WriteLine("Введите имя пользователя");
             var username = Console.ReadLine();
+            System.Console.WriteLine("Введите Пароль");
             var password = ReadPassword();
             var id = 0;
             var existinguser = _db.Users.FirstOrDefault(x => x.username == username && x.password == password);
