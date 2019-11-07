@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Generic;
 
 namespace TaskDB
 {
-    class Job
+    public class Job
     {
         public Guid id { get; set; }
         public string Name { get; set; }
@@ -14,5 +15,7 @@ namespace TaskDB
         public DateTime CreationDate { get; set; }
 
         public DateTime? Date { get; set; }
+
+        public int userid { get; set; }
     }
 }

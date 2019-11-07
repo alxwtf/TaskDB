@@ -7,9 +7,11 @@ namespace TaskDB
     class Actions
     {
         private Context _db;
-        public Actions(Context db)
+        private int _userid {get; set; }
+        public Actions(Context db,int userid)
         {
             _db = db;
+            _userid = userid;
         }
         public void Add()
         {
@@ -31,7 +33,8 @@ namespace TaskDB
                 Description = Description,
                 Tag = Tags,
                 CreationDate = CreationDate,
-                Date = Date
+                Date = Date,
+                userid = _userid
             });
             _db.SaveChanges();
         }
@@ -53,7 +56,6 @@ namespace TaskDB
                 if (Job.Date != null)
                 {
                     Console.WriteLine($"Дата завершения: {Job.Date.Value.ToString("dd.MM.yyyy")}");
-                    // System.Console.WriteLine(Job.Date.Value.ToString("dd.m.yyyy"));
                 }
             }
             Console.WriteLine();
@@ -69,7 +71,7 @@ namespace TaskDB
                     {
                         Console.WriteLine("Введите название Задачи");
                         var name = Console.ReadLine();
-                        var query = _db.Jobs.Where(x => x.Name == name).ToList();
+                        var query = _db.Jobs.Where(x => x.Name == name && x.userid==_userid).ToList();
                         if (query.Count() != 0) History(query);
                         else Console.WriteLine("Задачи не найдены");
                         break;
@@ -78,7 +80,7 @@ namespace TaskDB
                     {
                         Console.WriteLine("Введите Тэг(и)");
                         var tags = Console.ReadLine();
-                        var query = _db.Jobs.Where(x => x.Tag.Contains(tags)).ToList();
+                        var query = _db.Jobs.Where(x => x.Tag.Contains(tags) && x.userid==_userid).ToList();
                         if (query.Count() != 0) History(query);
                         else Console.WriteLine("Задачи не найдены");
                         break;
@@ -91,7 +93,7 @@ namespace TaskDB
             Console.Clear();
             if (_db.Jobs.Count() != 0)
             {
-                var GuidList = _db.Jobs.Select(x => new { x.id }).ToList();
+                var GuidList = _db.Jobs.Select(x => new { x.id, x.userid }).Where(x=>x.userid==_userid).ToList();
                 var count = 1;
                 foreach (var item in GuidList)
                 {
@@ -99,7 +101,7 @@ namespace TaskDB
                 }
                 Console.WriteLine($"Введите ID(Guid) Задачи");
                 var task = Console.ReadLine();
-                var query = _db.Jobs.Where(x => x.id.ToString().Contains(task)).ToList();
+                var query = _db.Jobs.Where(x => x.id.ToString().Contains(task) && x.userid==_userid).ToList();
                 History(query);
             }
             else Console.WriteLine("Задач на данный момент нет");
@@ -114,7 +116,7 @@ namespace TaskDB
                 Console.WriteLine($"Введите ID(Guid) Задачи");
                 var guid = Console.ReadLine();
                 Console.WriteLine("Введите новые тэги через пробел");
-                var setTag = _db.Jobs.Where(x => x.id.ToString().Contains(guid)).FirstOrDefault();
+                var setTag = _db.Jobs.Where(x => x.id.ToString().Contains(guid) && x.userid==_userid).FirstOrDefault();
                 setTag.Tag = Console.ReadLine();
                 _db.SaveChanges();
             }
@@ -123,7 +125,9 @@ namespace TaskDB
         public void DeleteTask()
         {
             Console.Clear();
-            var query = _db.Jobs.Select(x => new { x.id, x.Name, x.Description }).ToList();
+            var query = _db.Jobs.Select(x => new { x.id, x.Name, x.Description, x.userid })
+                        .Where(x=>x.userid==_userid)
+                        .ToList();
             if (query.Count != 0)
             {
                 foreach (var job in query)
@@ -139,7 +143,7 @@ namespace TaskDB
                     guid = Console.ReadLine();
                     if (guid != "")
                     {
-                        var toRemove = _db.Jobs.Where(x => x.id.ToString().Contains(guid)).FirstOrDefault();
+                        var toRemove = _db.Jobs.Where(x => x.id.ToString().Contains(guid) && x.userid==_userid).FirstOrDefault();
                         _db.Jobs.Remove(toRemove);
                         _db.SaveChanges();
                         System.Console.WriteLine("Успешно удалено\n");

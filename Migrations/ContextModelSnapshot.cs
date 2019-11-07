@@ -34,9 +34,35 @@ namespace TaskDB.Migrations
 
                     b.Property<string>("Tag");
 
+                    b.Property<int>("userid");
+
                     b.HasKey("id");
 
+                    b.HasIndex("userid");
+
                     b.ToTable("Jobs");
+                });
+
+            modelBuilder.Entity("TaskDB.User", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("password");
+
+                    b.Property<string>("username");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("TaskDB.Job", b =>
+                {
+                    b.HasOne("TaskDB.User")
+                        .WithMany("Jobs")
+                        .HasForeignKey("userid")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }
